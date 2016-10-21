@@ -33,6 +33,14 @@ bucket = BucketManager(q)
 
 hook_url = os.environ.get('hook_url')
 
+# local_time = time.localtime()
+# # day_stamp = time.strftime("%Y-%m-%d")
+# day_stamp = '20161013'
+# collection = db['realtime_quotes_'+day_stamp]
+datetime_format = "%Y-%m-%d %H:%M:%S"
+
+granularity =10
+
 def cache_sina_stock_gif(stock_code):
     if stock_code.startswith('60'):
         sina_code = 'sh'+stock_code
