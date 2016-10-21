@@ -91,5 +91,5 @@ def after_alert_save(alert):
         msg = leancloud.Query('Alert').get(alert.msg)
         test_alarming_bearychat(msg)
         log.info(msg)
-    except leancloud.LeanCloudError:
+    except LeanCloudError:
         raise leancloud.LeanEngineError(message='An error occurred while trying to save the Alert. ')
