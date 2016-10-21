@@ -77,23 +77,32 @@ def alarming_bearychat(msg):
     }
     requests.post(hook_url,headers = headers,data = json.dumps(bearychat_msg))
 
-def review_alarming_bearychat(msg):   #区别是多了一个 index，一个股票的所有提醒是一次发送的
-    stock_code = msg['stock_code']
-    img_url = cache_sina_stock_gif(stock_code)
-    src = u'新图' if 'sinajs' in img_url else  u'缓存'
+# def review_alarming_bearychat(msg):   #区别是多了一个 index，一个股票的所有提醒是一次发送的
+#     stock_code = msg['stock_code']
+#     img_url = cache_sina_stock_gif(stock_code)
+#     src = u'新图' if 'sinajs' in img_url else  u'缓存'
+#     bearychat_msg ={
+#         "text": '**'+str(msg['index'])+'.'+msg['name']+' '+ stock_code+'**\n>'+' | '.join(msg['time_list']),
+#         "markdown": True,
+#         "attachments": [{
+#             "text": msg['name']+u" 分时图 ("+ src +') '+time.strftime(datetime_format),
+#             "color": "#ff0000",
+#             "images": [{"url": img_url}]
+#         }]
+#     }
+#     headers = {
+#     'Content-Type': 'application/json'
+#     }
+#     log.info(json.dumps(bearychat_msg))
+#     requests.post(review_hook_url,headers = headers,data = json.dumps(bearychat_msg))
+def review_alarming_bearychat():   #区别是多了一个 index，一个股票的所有提醒是一次发送的
     bearychat_msg ={
-        "text": '**'+str(msg['index'])+'.'+msg['name']+' '+ stock_code+'**\n>'+' | '.join(msg['time_list']),
+        "text": u'今日复盘报告已经生成，请去 LeanCloud 查看！',
         "markdown": True,
-        "attachments": [{
-            "text": msg['name']+u" 分时图 ("+ src +') '+time.strftime(datetime_format),
-            "color": "#ff0000",
-            "images": [{"url": img_url}]
-        }]
     }
     headers = {
     'Content-Type': 'application/json'
     }
-    log.info(json.dumps(bearychat_msg))
     requests.post(review_hook_url,headers = headers,data = json.dumps(bearychat_msg))
 
 @engine.after_save('Alert')  # Alert 为需要 hook 的 class 的名称
@@ -107,7 +116,11 @@ def after_alert_save(alert):
 @engine.after_save('ReviewAlert')  # Alert 为需要 hook 的 class 的名称
 def after_alert_save(alert):
     try:
-        msg = alert.get('msg')
-        review_alarming_bearychat(msg)
+        review_alarming_bearychat()
     except leancloud.LeanCloudError:
         raise leancloud.LeanEngineError(message='An error occurred while trying to save the Alert. ')
+    # try:
+    #     msg = alert.get('msg')
+    #     review_alarming_bearychat(msg)
+    # except leancloud.LeanCloudError:
+    #     raise leancloud.LeanEngineError(message='An error occurred while trying to save the Alert. ')
