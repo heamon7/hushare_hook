@@ -88,7 +88,7 @@ def test_alarming_bearychat(msg):
 @engine.after_save('Alert')  # Alert 为需要 hook 的 class 的名称
 def after_alert_save(alert):
     try:
-        msg = leancloud.Query('Alert').get(alert.msg)
+        msg = alert.get('msg')
         test_alarming_bearychat(msg)
         log.info(msg)
     except leancloud.LeanCloudError:
