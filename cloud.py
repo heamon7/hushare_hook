@@ -76,7 +76,7 @@ def alarming_bearychat(msg):
     }
     requests.post(hook_url,headers = headers,data = json.dumps(bearychat_msg))
 
-def test_alarming_bearychat(msg):
+def test_alarming_bearychat(msg):   #区别是多了一个 index，一个股票的所有提醒是一次发送的
     stock_code = msg['stock_code']
     img_url = cache_sina_stock_gif(stock_code)
     src = u'新图' if 'sinajs' in img_url else  u'缓存'
@@ -99,7 +99,14 @@ def test_alarming_bearychat(msg):
 def after_alert_save(alert):
     try:
         msg = alert.get('msg')
+        alarming_bearychat(msg)
+    except leancloud.LeanCloudError:
+        raise leancloud.LeanEngineError(message='An error occurred while trying to save the Alert. ')
+
+@engine.after_save('ReviewAlert')  # Alert 为需要 hook 的 class 的名称
+def after_alert_save(alert):
+    try:
+        msg = alert.get('msg')
         test_alarming_bearychat(msg)
-        log.info(msg)
     except leancloud.LeanCloudError:
         raise leancloud.LeanEngineError(message='An error occurred while trying to save the Alert. ')
